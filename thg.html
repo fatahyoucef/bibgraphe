@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!----======== CSS ======== -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!----===== Boxicons CSS ===== -->
+    <link
+      href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <title>Graphe</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css"
+      integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"
+      integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+      crossorigin="anonymous"
+    ></script>
+    <style type="text/css">
+      #mynetwork {
+        height: 100vh;
+        margin-left: 30px;
+        height: 900px;
+
+        position: relative;
+        float: left;
+      }
+      .dark {
+        background-color: #1f1f1f; /* Dark background color */
+        color: #1f1f1f; /* Text color */
+      }
+
+      #tempText {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        font-size: 20px;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
+        padding: 10px;
+        border: 1px solid lightgray;
+        z-index: 99;
+        display: none;
+      }
+      #tempText1 {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        font-size: 15px;
+        transform: translate(-50%, -50%);
+        background-color: #bdff8e;
+        padding: 10px;
+        border: 1px solid lightgray;
+        z-index: 99;
+        display: none;
+      }
+      #tempText2 {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        font-size: 15px;
+        transform: translate(-50%, -50%);
+        background-color: #ff663b;
+        padding: 10px;
+        border: 1px solid lightgray;
+        z-index: 99;
+        display: none;
+      }
+
+      #editWeightContainer {
+        top: 72% !important ;
+        display: none;
+        position: absolute;
+        z-index: 2;
+      }
+
+      .edge-label {
+        position: absolute;
+        background-color: #ffffff;
+        padding: 5px;
+        font-size: 12px;
+        color: #000;
+        border: 1px solid #000;
+        z-index: 1;
+      }
+      .degree-label {
+        position: absolute;
+        background-color: #ffffff;
+        padding: 5px;
+        font-size: 12px;
+        color: #000;
+        border: 1px solid #000;
+        z-index: 1;
+      }
+
+      #deleteNodeButton {
+        font-family: "Poppins", sans-serif;
+        border: 1px solid #707070;
+        border-radius: 5px;
+        padding: 5px;
+        color: #707070;
+        background-color: white;
+      }
+      .btn-primary {
+        font-family: "Poppins", sans-serif;
+        border: 1px solid #707070;
+        border-radius: 5px;
+        padding: 5px;
+        color: #707070;
+        background-color: white;
+      }
+      table {
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar close">
+      <header>
+        <div class="image-text">
+          <span class="image">
+            <!--<img src="logo.png" alt="">-->
+          </span>
+          <div class="text logo-text">
+            <span class="name">GÉNIE</span>
+            <span class="profession"> GRAPHE</span>
+          </div>
+        </div>
+        <i class="bx bx-chevron-right toggle"></i>
+      </header>
+      <div class="menu-bar">
+        <div class="menu">
+          <li class="search-box"></li>
+          <ul class="menu-links">
+            <li class="nav-link">
+              <a>
+                <button onclick="addNode()">Ajouter Sommet</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="toggleWeights()">ponderation</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="toggleGraphDirection()">orientation</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="toggleGraphView()">2D-3D</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="showdegrees()">degres</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="showComplementGraph()">
+                  graphe complementaire
+                </button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="isSymmetric()">symetrique</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="isAntisymmetric()">Antisymetrique</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="isComplete()">Complet</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="checkConnected()">connexite</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="findMaxClique();">Clique Maximal</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="checkEulerianPath()">chemin eulerien</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="checkHamiltonianPath()">
+                  Chemin hamiltonien
+                </button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="checkHamiltonianCycle()">
+                  Cycle hamiltonien
+                </button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="showmatrices()">Matrice adjacence</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="colorGraph()">Coloration</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="showMaximalMatching()">
+                  Couplage Maximal
+                </button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="showMinimumSpanningTree()">
+                  Arbre couvrante min
+                </button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="Djikestra()">dijkstra</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="executeBellmanFord()">Bellman</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="maxflowbutton()">Flot Maximal</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="fordFulkersonAlgorithm()">
+                  Ford-Fulkerson
+                </button>
+              </a>
+            </li>
+
+            <li class="nav-link">
+              <a>
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept=".csv"
+                  onchange="handleFileUpload()"
+                  style="display: none"
+                />
+                <label
+                  style="
+                    display: inline-block;
+                    padding-left: 46px;
+                    color: #707070;
+                    font-weight: 25px;
+                  "
+                  for="fileInput"
+                  >Importer CSV</label
+                >
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="exportGraphAsCSV()">Exporter csv</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="restoreOriginalGraph()">Reset Graph</button>
+              </a>
+            </li>
+            <li class="nav-link">
+              <a>
+                <button onclick="refreshPage()">supprimer</button>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="bottom-content">
+          <li class="mode">
+            <div class="sun-moon">
+              <i class="bx bx-moon icon moon"></i>
+              <i class="bx bx-sun icon sun"></i>
+            </div>
+            <span class="mode-text text">Dark</span>
+            <div class="toggle-switch">
+              <span class="switch"></span>
+            </div>
+          </li>
+        </div>
+      </div>
+    </nav>
+    <section class="home">
+      <div class="text">Dashboard Sidebar</div>
+    </section>
+    <script>
+      const body = document.querySelector("body"),
+        sidebar = body.querySelector("nav"),
+        toggle = body.querySelector(".toggle"),
+        searchBtn = body.querySelector(".search-box"),
+        modeSwitch = body.querySelector(".toggle-switch"),
+        modeText = body.querySelector(".mode-text");
+      toggle.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+      });
+      searchBtn.addEventListener("click", () => {
+        sidebar.classList.remove("close");
+      });
+      modeSwitch.addEventListener("click", () => {
+        body.classList.toggle("dark");
+        var myDiv = document.getElementById("mynetwork");
+        if (body.classList.contains("dark")) {
+          modeText.innerText = "Light";
+          myDiv.classList.add("dark");
+        } else {
+          modeText.innerText = "Dark";
+          myDiv.classList.remove("dark");
+        }
+      });
+    </script>
+    <div class="card">
+      <div id="mynetwork" class="card-body" style="height: 99vh"></div>
+    </div>
+
+    <div id="tempText"></div>
+
+    <div
+      id="editWeightContainer"
+      class="position-absolute top-50 start-50 translate-middle"
+    >
+      <input
+        type="number"
+        id="weightInput"
+        placeholder="Enter Weight"
+        value="0"
+      />
+      <button class="btn btn-primary" onclick="editSelectedEdgeWeight()">
+        Edit Weight
+      </button>
+      <button class="btn btn-primary" onclick="deleteEdge()">
+        supprimer l'arc
+      </button>
+    </div>
+
+    <div id="tempText"></div>
+    <div id="tempText1"></div>
+    <div id="tempText2"></div>
+    <div id="matrixPopup" class="popup">
+      <div class="popup-content">
+        <span class="close" onclick="closeMatrixPopup()">&times;</span>
+        <table id="adjacencyMatrixTable"></table>
+      </div>
+    </div>
+
+    <!-- Your other HTML content -->
+
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script>
+      function openMatrixPopup(matrix) {
+        document.getElementById("adjacencyMatrix").innerText =
+          matrixToString(matrix);
+        document.getElementById("matrixPopup").style.display = "block";
+      }
+      // Function to close the adjacency matrix popup
+      function closeMatrixPopup() {
+        document.getElementById("matrixPopup").style.display = "none";
+      }
+      // Function to convert a matrix to a string for display
+      function openMatrixPopup(matrix) {
+        const adjacencyMatrixTable = document.getElementById(
+          "adjacencyMatrixTable"
+        );
+        const nodesNames = nodes.map((node) => node.id);
+
+        // Create table header
+        let tableHTML = "<tr><th></th>";
+
+        for (const nodeName of nodesNames) {
+          tableHTML += `<th>${nodeName}</th>`;
+        }
+
+        tableHTML += "</tr>";
+
+        // Create table body
+
+        for (let i = 0; i < matrix.length; i++) {
+          tableHTML += "<tr>";
+          tableHTML += `<td>${nodesNames[i]}</td>`;
+
+          for (let j = 0; j < matrix[i].length; j++) {
+            tableHTML += `<td>${matrix[i][j]}</td>`;
+          }
+
+          tableHTML += "</tr>";
+        }
+
+        adjacencyMatrixTable.innerHTML = tableHTML;
+        console.log("this is the error");
+        document.getElementById("matrixPopup").style.display = "block";
+      }
+    </script>
+
+    <script type="text/javascript">
+      let newNodeId = 0;
+      var edges;
+      var nodes;
+      var network;
+      var options;
+      var selectedNode = null;
+      var selectedEdge = null;
+      var isChangingLink = false;
+      var showDegrees = false;
+      var hasWeights = true; // Default is true, meaning weights are initially present
+      var graphDirectiontoggle = true;
+
+      function refreshPage() {
+        location.reload();
+      }
+
+      function drawGraph() {
+        var container = document.getElementById("mynetwork");
+
+        nodes = new vis.DataSet([]);
+        edges = new vis.DataSet([]);
+
+        data = { nodes: nodes, edges: edges };
+
+        options = {
+          configure: {
+            enabled: false,
+          },
+          edges: {
+            arrows: {
+              to: {
+                enabled: true,
+              },
+            },
+            color: {
+              inherit: true,
+            },
+            smooth: {
+              enabled: true,
+              type: "dynamic",
+            },
+          },
+          interaction: {
+            dragNodes: true,
+            hideEdgesOnDrag: false,
+            hideNodesOnDrag: false,
+          },
+          physics: {
+            enabled: true,
+            stabilization: {
+              enabled: true,
+              fit: true,
+              iterations: 1000,
+              onlyDynamicEdges: false,
+              updateInterval: 50,
+            },
+          },
+        };
+
+        network = new vis.Network(container, data, options);
+
+        network.on("click", function (params) {
+          if (params.nodes.length > 0) {
+            handleNodeClick(params.nodes[0]);
+          } else if (params.edges.length > 0) {
+            var edgeId = params.edges[0];
+            showEditWeightContainer(edgeId);
+          } else {
+            hideEditWeightContainer();
+          }
+        });
+
+        return network;
+      }
+
+      function toggleWeights() {
+        hasWeights = !hasWeights;
+
+        edges.forEach(function (edge) {
+          if (hasWeights) {
+            // Show weights
+            edge.label = edge.originalLabel || "0";
+          } else {
+            // Hide weights
+            edge.originalLabel = edge.label;
+            edge.label = "";
+          }
+        });
+
+        network.setData({ nodes: nodes, edges: edges });
+      }
+      // shows degrees
+      function updateDegreeLabels() {
+        var degreeLabelContainer = document.getElementById(
+          "degree-label-container"
+        );
+
+        if (!degreeLabelContainer) {
+          degreeLabelContainer = document.createElement("div");
+          degreeLabelContainer.id = "degree-label-container";
+          document
+            .getElementById("mynetwork")
+            .appendChild(degreeLabelContainer);
+        }
+
+        nodes.forEach(function (node) {
+          var nodeId = node.id;
+          var degreeLabelId = "degree-label-" + nodeId;
+          var degreeLabel = document.getElementById(degreeLabelId);
+
+          if (!degreeLabel) {
+            degreeLabel = document.createElement("div");
+            degreeLabel.id = degreeLabelId;
+            degreeLabel.className = "degree-label";
+            degreeLabelContainer.appendChild(degreeLabel); // Append to the container
+          }
+
+          var nodePosition = network.getPositions([nodeId]);
+          degreeLabel.style.position = "absolute";
+          degreeLabel.style.left = nodePosition[nodeId].x + "px";
+          degreeLabel.style.top = nodePosition[nodeId].y + "px"; // Adjust the vertical position
+          degreeLabel.innerHTML =
+            "Degree: " + network.getConnectedNodes(nodeId).length;
+        });
+
+        // Remove extra degree labels
+        var existingDegreeLabels = degreeLabelContainer.children;
+        for (var i = existingDegreeLabels.length - 1; i >= nodes.length; i--) {
+          existingDegreeLabels[i].parentNode.removeChild(
+            existingDegreeLabels[i]
+          );
+        }
+      }
+
+      function addNode() {
+        // Keep generating new IDs until a unique one is found
+        do {
+          newNodeId = newNodeId + 1;
+        } while (nodeIdExists(newNodeId));
+
+        var newNode = {
+          color: "#F29F05",
+          id: newNodeId.toString(), // Convert ID to string
+          label: newNodeId.toString(),
+          shape: "dot",
+          size: 17,
+        };
+        newNode.font = {
+          color: "black", // Couleur du texte
+          size: 17, // Taille du texte
+          face: "arial", // Police du texte
+          align: "center", // Alignement du texte ('center' ou 'left')
+          vadjust: 5, // Ajustement vertical du texte
+        };
+
+        nodes.add(newNode);
+      }
+
+      function nodeIdExists(nodeId) {
+        // Check if the node with the given ID already exists in the graph
+        return nodes.get().some((node) => node.id === nodeId.toString());
+      }
+
+      function toggleGraphDirection() {
+        graphDirectiontoggle = !graphDirectiontoggle;
+        options.edges.arrows.to.enabled = !options.edges.arrows.to.enabled;
+
+        if (!options.edges.arrows.to.enabled) {
+          edges.forEach(function (edge) {
+            var reverseEdge = edges.get({
+              filter: function (item) {
+                return item.from === edge.to && item.to === edge.from;
+              },
+            });
+
+            if (reverseEdge.length > 0) {
+              edges.remove(reverseEdge);
+            }
+          });
+        }
+
+        network.setOptions(options);
+      }
+
+      function handleNodeClick(nodeId) {
+        if (isChangingLink) {
+          hideDeleteNodeButton();
+          changeLink(selectedNode, nodeId);
+          isChangingLink = false;
+        } else {
+          text =
+            "Click on another node to link with the selected node. Click on the same node to create a self-loop.";
+          showLinkButtonn(text);
+          selectedNode = nodeId;
+          showDeleteNodeButton(nodeId);
+        }
+      }
+      function hideDeleteNodeButton() {
+        var deleteNodeButton = document.getElementById("deleteNodeButton");
+
+        // Check if the button exists before attempting to remove it
+        if (deleteNodeButton) {
+          deleteNodeButton.parentNode.removeChild(deleteNodeButton);
+        }
+      }
+      function showDeleteNodeButton(nodeId) {
+        var deleteButton = document.getElementById("deleteNodeButton");
+
+        deleteButton = document.createElement("button");
+        deleteButton.id = "deleteNodeButton";
+        deleteButton.innerHTML = "Delete Node";
+        deleteButton.onclick = function () {
+          deleteNode(nodeId);
+        };
+
+        // Append the button to the body or any desired container
+        document.body.appendChild(deleteButton);
+
+        // Position the button on the top left of the page
+        deleteButton.style.position = "fixed";
+        deleteButton.style.left = "46%";
+        deleteButton.style.top = "90%";
+        deleteButton.style.zIndex = 10; // Ensure it's above other elements
+      }
+      function deleteNode(nodeId) {
+        edges.forEach(function (edge) {
+          if (edge.to == nodeId || edge.from == nodeId) {
+            edges.remove(edge); // Supprimer l'arête du jeu de données des arêtes
+          }
+        });
+        nodes.remove({ id: nodeId });
+        hideDeleteNodeButton();
+      }
+
+      function showLinkButton(text) {
+        var tempText = document.getElementById("tempText");
+        var tempText1 = document.getElementById("tempText1");
+        var tempText2 = document.getElementById("tempText2");
+        tempText1.style.display = "none";
+        tempText2.style.display = "none";
+        tempText.innerHTML = text;
+        tempText.style.display = "block";
+
+        setTimeout(function () {
+          tempText.style.display = "none";
+        }, 15000);
+
+        isChangingLink = true;
+      }
+      function showLinkButtonn(text) {
+        var tempText = document.getElementById("tempText");
+        var tempText1 = document.getElementById("tempText1");
+        var tempText2 = document.getElementById("tempText2");
+        tempText.style.display = "none";
+        tempText2.style.display = "none";
+        tempText1.innerHTML = text;
+        tempText1.style.display = "block";
+
+        setTimeout(function () {
+          tempText1.style.display = "none";
+        }, 3000);
+
+        isChangingLink = true;
+      }
+      function showLinkButton1(text) {
+        var tempText = document.getElementById("tempText");
+        var tempText1 = document.getElementById("tempText1");
+        var tempText2 = document.getElementById("tempText2");
+        tempText1.style.display = "none";
+        tempText.style.display = "none";
+        tempText2.innerHTML = text;
+        tempText2.style.display = "block";
+
+        setTimeout(function () {
+          tempText2.style.display = "none";
+        }, 3000);
+
+        isChangingLink = true;
+      }
+
+      function changeLink(fromNodeId, toNodeId) {
+        if (fromNodeId != toNodeId) {
+          var existingEdge = edges.get({
+            filter: function (item) {
+              return item.from === fromNodeId && item.to === toNodeId;
+            },
+          });
+
+          if (existingEdge.length === 0) {
+            var defaultLabel = hasWeights ? "0" : "";
+            edges.add({
+              from: fromNodeId,
+              to: toNodeId,
+              label: defaultLabel,
+              width: 1,
+            });
+          } else {
+            text = "Edge already exists between these nodes.";
+            showLinkButton1(text);
+          }
+        } else {
+          text = "Invalid node ID. Please enter a number.";
+          showLinkButton1(text);
+        }
+      }
+
+      function showComplementGraph() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        var complementEdges = [];
+
+        nodes.forEach(function (node) {
+          nodes.forEach(function (targetNode) {
+            if (node.id !== targetNode.id) {
+              var edgeExists = edges.get({
+                filter: function (item) {
+                  return item.from === node.id && item.to === targetNode.id;
+                },
+              });
+
+              if (edgeExists.length === 0) {
+                complementEdges.push({
+                  from: node.id,
+                  to: targetNode.id,
+                  label: "0", // Default weight is set to 0
+                  width: 1,
+                });
+              } else {
+                // If an edge exists, remove it
+                edges.remove(edgeExists);
+              }
+            }
+          });
+        });
+
+        // Add all new edges
+        edges.add(complementEdges);
+      }
+
+      function showDeleteButton(edgeId) {
+        selectedEdge = edgeId;
+
+        var edgePosition = network.getPositions([edgeId]);
+        var button = document.getElementById("deleteEdgeButton");
+        button.style.left = 5 + "px";
+        button.style.top = 5 + "px";
+        button.style.display = "block";
+      }
+
+      function deleteSelectedEdge() {
+        if (selectedEdge !== null) {
+          edges.remove({ id: selectedEdge });
+          hideDeleteButton();
+        }
+      }
+
+      function hideDeleteButton() {
+        var button = document.getElementById("deleteEdgeButton");
+        button.style.display = "none";
+      }
+      var is3DView = false;
+
+      function toggleGraphView() {
+        is3DView = !is3DView;
+
+        if (is3DView) {
+          // Switch to 3D view and add gravity
+          options.physics.enabled = true;
+          options.physics.solver = "forceAtlas2Based";
+          options.physics.forceAtlas2Based = {
+            gravitationalConstant: -50,
+            centralGravity: 0.005,
+            springLength: 100,
+            springConstant: 0.08,
+            damping: 0.4,
+            avoidOverlap: 0,
+          };
+        } else {
+          // Switch to 2D view and remove gravity
+          options.physics.enabled = false;
+        }
+
+        network.setOptions(options);
+      }
+
+      function showEditWeightContainer(edgeId) {
+        selectedEdge = edgeId;
+
+        var edge = edges.get(edgeId);
+        var container = document.getElementById("editWeightContainer");
+
+        if (edge) {
+          // Get positions of the 'from' and 'to' nodes
+          var fromPosition = network.getPositions([edge.from])[edge.from];
+          var toPosition = network.getPositions([edge.to])[edge.to];
+
+          // Calculate the midpoint between the nodes
+          var midX = (fromPosition.x + toPosition.x) / 2;
+          var midY = (fromPosition.y + toPosition.y) / 2;
+          console.log(midX, midY);
+          container.style.left = midX + "px";
+          container.style.top = midY + "px";
+          container.style.display = "block";
+
+          // Set the current weight in the input field
+          document.getElementById("weightInput").value = edge.label || 0;
+        }
+      }
+
+      function hideEditWeightContainer() {
+        var container = document.getElementById("editWeightContainer");
+        container.style.display = "none";
+      }
+
+      function editSelectedEdgeWeight() {
+        var weightInput = document.getElementById("weightInput");
+        var newWeight = parseFloat(weightInput.value);
+
+        if (!isNaN(newWeight)) {
+          edges.update({ id: selectedEdge, label: newWeight.toString() });
+        }
+
+        hideEditWeightContainer();
+      }
+      function deleteEdge() {
+        var weightInput = document.getElementById("weightInput");
+
+        edges.remove({ id: selectedEdge });
+
+        hideEditWeightContainer();
+      }
+
+      function colorGraph() {
+        saveOriginalGraph();
+        var colorMap = {};
+        var availableColors = [
+          "#FF5733",
+          "#33FF57",
+          "#5733FF",
+          "#FF3357",
+          "#57FF33",
+          "#3357FF",
+          "#FFC300",
+          "#FF66B2",
+          "#66FFB2",
+          "#6666FF",
+          "#FF6666",
+          "#66FFFF",
+          "#FF9933",
+          "#CC00CC",
+          "#99FF33",
+          "#9933FF",
+          "#33FF99",
+          "#FFCC33",
+        ]; // Add more colors if needed
+
+        nodes.forEach(function (node) {
+          var neighbors = network.getConnectedNodes(node.id);
+          var neighborColors = neighbors.map(function (neighbor) {
+            return colorMap[neighbor];
+          });
+
+          for (var color of availableColors) {
+            if (!neighborColors.includes(color)) {
+              colorMap[node.id] = color;
+              break;
+            }
+          }
+        });
+
+        nodes.forEach(function (node) {
+          nodes.update({ id: node.id, color: colorMap[node.id] });
+        });
+      }
+      function checkConnected() {
+        var isStronglyConnected = isGraphStronglyConnected();
+        if (isStronglyConnected) {
+          text = "Le graphe est fortement connexe";
+          showLinkButton(text);
+        } else {
+          text = "Le graphe n'est pas fortement connexe";
+          showLinkButton(text);
+        }
+      }
+
+      // Function to check if the directed graph is strongly connected using DFS
+      function isGraphStronglyConnected() {
+        var nodesArray = nodes.get();
+
+        for (var i = 0; i < nodesArray.length; i++) {
+          var startNodeId = nodesArray[i].id;
+          var visited = {};
+          DFS(startNodeId);
+
+          // Check if all nodes are visited
+          for (var j = 0; j < nodesArray.length; j++) {
+            if (!visited[nodesArray[j].id]) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+
+        // Depth-First Search
+        function DFS(nodeId) {
+          visited[nodeId] = true;
+
+          var neighbors = network.getConnectedNodes(nodeId, "to");
+          for (var i = 0; i < neighbors.length; i++) {
+            if (!visited[neighbors[i]]) {
+              DFS(neighbors[i]);
+            }
+          }
+        }
+      }
+
+      function handleFileUpload() {
+        var fileInput = document.getElementById("fileInput");
+        var file = fileInput.files[0];
+
+        if (file) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+            var graphData = parseCSV(e.target.result);
+            if (graphData) {
+              loadGraph(graphData);
+            } else {
+              alert("Error parsing CSV file. Please check the format.");
+            }
+          };
+
+          reader.readAsText(file);
+        }
+      }
+
+      function parseCSV(csvData) {
+        // Implement your own CSV parsing logic here
+        // For simplicity, assuming the CSV format is: "source,target,weight"
+        var lines = csvData.split("\n");
+        var nodes = new Set();
+        var edges = [];
+
+        for (var i = 1; i < lines.length; i++) {
+          var parts = lines[i].split(",");
+          if (parts.length >= 2) {
+            var source = parts[0].trim();
+            var target = parts[1].trim();
+            var weight = parts.length > 2 ? parts[2].trim() : "0";
+
+            nodes.add(source);
+            nodes.add(target);
+            if (weight !== "#") {
+              edges.push({ from: source, to: target, label: weight });
+            }
+          }
+        }
+
+        if (nodes.size > 0) {
+          return { nodes: Array.from(nodes).map((id) => ({ id })), edges };
+        } else {
+          console.log("Couldn't find");
+          return null;
+        }
+      }
+
+      function loadGraph(graphData) {
+        // Clear existing nodes and edges
+        nodes.clear();
+        edges.clear();
+
+        // Add nodes and edges from the loaded graph data
+        graphData.nodes.forEach((node) => {
+          node = {
+            color: "#695cfe",
+            id: node.id.toString(),
+            label: newNodeId.toString(),
+            shape: "dot",
+            size: 17,
+          };
+          nodes.add(node); // Ajouter un nouveau nœud
+        });
+        graphData.edges.forEach((edge) => edges.add(edge));
+
+        // Update the network with the new data
+        network.setData({ nodes: nodes, edges: edges });
+        showdegrees();
+        showdegrees();
+      }
+
+      // Add a global variable to track whether degrees are currently shown
+      var showDegrees = false;
+
+      function showdegrees() {
+        showDegrees = !showDegrees;
+
+        if (showDegrees) {
+          updateDegreeLabels();
+        } else {
+          resetNodeLabels();
+        }
+      }
+
+      function updateDegreeLabels() {
+        nodes.forEach(function (node) {
+          var nodeId = node.id;
+          var degree = network.getConnectedNodes(nodeId).length;
+          var updatedLabel = "(" + degree + ") " + node.id;
+
+          // Update the node label with degree information
+          nodes.update({ id: nodeId, label: updatedLabel });
+        });
+      }
+
+      function resetNodeLabels() {
+        // Reset the labels to the original node IDs
+        nodes.forEach(function (node) {
+          nodes.update({ id: node.id, label: node.id.toString() });
+        });
+      }
+      function hasNegativeWeights() {
+        var edgesArray = edges.get();
+
+        for (var i = 0; i < edgesArray.length; i++) {
+          var weight = parseFloat(edgesArray[i].label);
+
+          if (isNaN(weight) || weight < 0) {
+            return true; // Found a negative or invalid weight
+          }
+        }
+
+        return false; // No negative weights found
+      }
+
+      function Djikestra() {
+        saveOriginalGraph();
+        saveOriginalGraph();
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        hasNegativeWeightsInGraph = hasNegativeWeights();
+        if (!hasNegativeWeightsInGraph) {
+          // Prompt the user to choose a node
+          var selectedNodeId = prompt("Enter the ID of the starting node:");
+
+          // Check if the selected node exists in the graph
+          if (!nodes.get(selectedNodeId)) {
+            showText("Invalid node ID. Please enter a valid node ID.");
+            return;
+          }
+
+          // Execute the Bellman-Ford algorithm
+          var distances = bellmanFord(selectedNodeId);
+
+          // Check if the algorithm executed successfully
+          if (distances) {
+            // Display the results using the showText function
+            showText(
+              "Shortest distances from node " +
+                selectedNodeId +
+                ": " +
+                JSON.stringify(distances)
+            );
+          } else {
+            //  the user if the algorithm couldn't be executed
+            showText(
+              "The Bellman-Ford algorithm cannot be executed. Check for negative ponduration."
+            );
+          }
+        } else {
+          showText(
+            "The Bellman-Ford algorithm cannot be executed. Check for negative ponduration."
+          );
+        }
+      }
+      function executeBellmanFord() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        saveOriginalGraph();
+        graphehascycle = hasCycle();
+        if (!graphehascycle) {
+          // Prompt the user to choose a node
+          var selectedNodeId = prompt("Enter the ID of the starting node:");
+
+          // Check if the selected node exists in the graph
+          if (!nodes.get(selectedNodeId)) {
+            showText("Invalid node ID. Please enter a valid node ID.");
+            return;
+          }
+
+          // Execute the Bellman-Ford algorithm
+          var distances = bellmanFord(selectedNodeId);
+
+          // Check if the algorithm executed successfully
+          if (distances) {
+            // Display the results using the showText function
+            showText(
+              "Shortest distances from node " +
+                selectedNodeId +
+                ": " +
+                JSON.stringify(distances)
+            );
+          } else {
+            //  the user if the algorithm couldn't be executed
+            showText(
+              "The Bellman-Ford algorithm cannot be executed. Check for negative cycles."
+            );
+          }
+        } else {
+          showText(
+            "The Bellman-Ford algorithm cannot be executed. Check for negative cycles."
+          );
+        }
+      }
+
+      function hasCycle() {
+        var visited = {};
+        var stack = {};
+
+        function DFS(nodeId) {
+          visited[nodeId] = true;
+          stack[nodeId] = true;
+
+          var neighbors = network.getConnectedNodes(nodeId, "to");
+          for (var i = 0; i < neighbors.length; i++) {
+            var neighbor = neighbors[i];
+
+            if (!visited[neighbor]) {
+              if (DFS(neighbor)) {
+                return true;
+              }
+            } else if (stack[neighbor]) {
+              // If the neighbor is already in the stack, there is a cycle
+              return true;
+            }
+          }
+
+          // Remove the node from the stack after visiting its neighbors
+          stack[nodeId] = false;
+
+          return false;
+        }
+
+        // Check for a cycle in each unvisited node
+        var nodesArray = nodes.get();
+        for (var i = 0; i < nodesArray.length; i++) {
+          var nodeId = nodesArray[i].id;
+
+          if (!visited[nodeId]) {
+            if (DFS(nodeId)) {
+              return true; // Cycle found
+            }
+          }
+        }
+
+        return false; // No cycle found
+      }
+
+      // Function to display text on the page
+      function showText(text) {
+        var tempText = document.getElementById("tempText");
+        tempText.innerHTML = text;
+        tempText.style.display = "block";
+
+        setTimeout(function () {
+          tempText.style.display = "none";
+        }, 15000); // Display the text for 5 seconds
+      }
+
+      // Bellman-Ford Algorithm
+      function bellmanFord(startNodeId) {
+        var distances = {};
+        var predecessors = {};
+
+        // Initialize distances and predecessors
+        nodes.forEach(function (node) {
+          var nodeId = node.id;
+          distances[nodeId] = nodeId === startNodeId ? 0 : Infinity;
+          predecessors[nodeId] = null;
+        });
+
+        // Relax edges repeatedly
+        for (var i = 1; i < nodes.length; i++) {
+          edges.forEach(function (edge) {
+            var fromNodeId = edge.from;
+            var toNodeId = edge.to;
+            var weight = parseFloat(edge.label);
+
+            if (distances[fromNodeId] + weight < distances[toNodeId]) {
+              distances[toNodeId] = distances[fromNodeId] + weight;
+              predecessors[toNodeId] = fromNodeId;
+            }
+          });
+        }
+
+        // Check for negative cycles
+        edges.forEach(function (edge) {
+          var fromNodeId = edge.from;
+          var toNodeId = edge.to;
+          var weight = parseFloat(edge.label);
+
+          if (distances[fromNodeId] + weight < distances[toNodeId]) {
+            // Negative cycle found
+            return null;
+          }
+        });
+        nodes.forEach(function (node) {
+          var nodeId = node.id;
+
+          if (predecessors[nodeId] !== null) {
+            var edgeId = getEdgeId(predecessors[nodeId], nodeId);
+
+            // Debug logs
+            console.log("Node ID:", nodeId);
+            console.log("Predecessor ID:", predecessors[nodeId]);
+            console.log("Edge ID:", edgeId);
+
+            edges.update({ id: edgeId, color: "red" });
+          }
+        });
+
+        return distances;
+      }
+      function getEdgeId(source, target) {
+        var edgesArray = edges.get();
+        for (var i = 0; i < edgesArray.length; i++) {
+          if (edgesArray[i].from === source && edgesArray[i].to === target) {
+            return edgesArray[i].id;
+          }
+        }
+      }
+      var originalNodes = null;
+      var originalEdges = null;
+      function saveOriginalGraph() {
+        originalNodes = new vis.DataSet(nodes.get());
+        originalEdges = new vis.DataSet(edges.get());
+      }
+
+      // Function to restore the original graph data
+      function restoreOriginalGraph() {
+        resetNodeColors();
+        if (originalNodes && originalEdges) {
+          // Clear existing nodes and edges
+          nodes.clear();
+          edges.clear();
+
+          // Add nodes and edges from the original graph data
+          originalNodes.forEach((node) => nodes.add(node));
+          originalEdges.forEach((edge) => edges.add(edge));
+
+          // Update the network with the new data
+          network.setData({ nodes: nodes, edges: edges });
+        }
+      }
+      function resetNodeColors() {
+        const defaultColor = "#695cfe"; // Change this to your desired default color
+
+        nodes.forEach((node) => {
+          node.color = defaultColor;
+        });
+
+        network.setData({ nodes: nodes, edges: edges });
+      }
+
+      function isSymmetric() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        var edgesArray = edges.get();
+
+        for (var i = 0; i < edgesArray.length; i++) {
+          var edge = edgesArray[i];
+
+          // Recherche de l'arête inverse
+          var reverseEdge = edges.get({
+            filter: function (item) {
+              return item.from === edge.to && item.to === edge.from;
+            },
+          });
+
+          // Vérifie si l'arête inverse existe et a des propriétés 'to' et 'from'
+          if (
+            reverseEdge.length > 0 &&
+            reverseEdge[0].to !== undefined &&
+            reverseEdge[0].from !== undefined
+          ) {
+            var x = getEdgeId(reverseEdge[0].to, reverseEdge[0].from);
+
+            if (!x) {
+              text = "n'est pas symétrique";
+              showLinkButton(text);
+              return false;
+            }
+          } else {
+            // Si l'arête inverse n'existe pas ou n'a pas les propriétés attendues, le graphe n'est pas symétrique
+            text = "n'est pas symétrique";
+            showLinkButton(text);
+            return false;
+          }
+        }
+
+        // Toutes les arêtes ont leur paire inverse, donc le graphe est symétrique
+        text = "est symetrique";
+        showLinkButton(text);
+        return true;
+      }
+      function isAntisymmetric() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        var edgesArray = edges.get();
+
+        for (var i = 0; i < edgesArray.length; i++) {
+          var edge = edgesArray[i];
+
+          // Recherche de l'arête inverse
+          var reverseEdge = edges.get({
+            filter: function (item) {
+              return item.from === edge.to && item.to === edge.from;
+            },
+          });
+
+          // Vérifie si l'arête inverse existe et a des propriétés 'to' et 'from'
+          if (
+            reverseEdge.length > 0 &&
+            reverseEdge[0].to !== undefined &&
+            reverseEdge[0].from !== undefined
+          ) {
+            var x = getEdgeId(reverseEdge[0].to, reverseEdge[0].from);
+
+            if (x) {
+              text = "n'est pas antisymetrique";
+              showLinkButton(text);
+              return false;
+            }
+          }
+        }
+
+        // Toutes les arêtes ont leur paire inverse, donc le graphe est symétrique
+        text = "est antisymétrique";
+        showLinkButton(text);
+        return true;
+      }
+      function isComplete() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+
+        var nodesArray = nodes.get();
+        var edgesArray = edges.get();
+
+        for (var i = 0; i < nodesArray.length; i++) {
+          for (var j = 0; j < nodesArray.length; j++) {
+            if (i !== j) {
+              var node1Id = nodesArray[i].id;
+              var node2Id = nodesArray[j].id;
+
+              // Recherche d'une arête de node1 vers node2
+              var edge = edgesArray.find(function (item) {
+                return item.from === node1Id && item.to === node2Id;
+              });
+
+              // Si l'arête est manquante, le graphe n'est pas complet
+              if (!edge) {
+                text = "n'est pas complet";
+                showLinkButton(text);
+                return false;
+              }
+            }
+          }
+        }
+
+        // Si chaque paire de nœuds distincts a une arête, le graphe est complet
+        text = "est complet";
+        showLinkButton(text);
+      }
+
+      function exportGraphAsCSV() {
+        // Get the current nodes and edges
+        var currentNodes = nodes.get();
+        var currentEdges = edges.get();
+
+        // Prepare CSV content
+        var csvContent = "source,target,weight\n";
+
+        // Add edges to the CSV content
+        currentEdges.forEach(function (edge) {
+          csvContent +=
+            edge.from + "," + edge.to + "," + (edge.label || 0) + "\n";
+        });
+
+        // Add isolated nodes to the CSV content with weight 0
+        currentNodes.forEach(function (node) {
+          if (!edgeExistsForNode(node.id, currentEdges)) {
+            csvContent += node.id + "," + node.id + ",#\n";
+          }
+        });
+
+        // Create a Blob containing the CSV content
+        var blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+
+        // Create a link element and trigger a download
+        var link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "graph.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Helper function to check if there is an edge connected to a node
+      function edgeExistsForNode(nodeId, edges) {
+        return edges.some(function (edge) {
+          return edge.from === nodeId || edge.to === nodeId;
+        });
+      }
+
+      //euler
+
+      function checkEulerianPath() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        // Copy the edges for manipulation
+        var copiedEdges = JSON.parse(JSON.stringify(edges.get()));
+
+        // Function to check if a node has an unvisited edge
+        function hasUnvisitedEdge(nodeId) {
+          return copiedEdges.some(
+            (edge) => edge.from === nodeId || edge.to === nodeId
+          );
+        }
+
+        // Function to get an unvisited edge index from a node
+        function getUnvisitedEdgeIndex(nodeId) {
+          return copiedEdges.findIndex(
+            (edge) => edge.from === nodeId || edge.to === nodeId
+          );
+        }
+
+        // Function to remove an edge from the copied edges
+        function removeEdge(index) {
+          copiedEdges.splice(index, 1);
+        }
+
+        // Function to perform DFS to check connectivity
+        function DFS(nodeId) {
+          visited[nodeId] = true;
+          var neighbors = network.getConnectedNodes(nodeId, "to");
+          for (var i = 0; i < neighbors.length; i++) {
+            if (!visited[neighbors[i]]) {
+              DFS(neighbors[i]);
+            }
+          }
+        }
+
+        // Initialize visited nodes
+        var visited = {};
+        nodes.forEach((node) => (visited[node.id] = false));
+
+        // Perform DFS starting from the first node
+        DFS(nodes.get()[0].id);
+
+        // Check if all nodes are visited
+        var isConnected = Object.values(visited).every((value) => value);
+
+        if (!isConnected) {
+          text =
+            "Le graphe n'est pas connecté. Impossible d'avoir un circuit ou chemin eulérien.";
+          showLinkButton(text);
+          return;
+        }
+
+        // Count the odd-degree nodes
+        var oddDegreeNodes = 0;
+        nodes.forEach((node) => {
+          var degree = network.getConnectedNodes(node.id).length;
+          if (degree % 2 !== 0) {
+            oddDegreeNodes++;
+          }
+        });
+
+        if (oddDegreeNodes === 0) {
+          // The graph has an Eulerian circuit
+
+          text = "Le graphe a un circuit eulérien.";
+          showLinkButton(text);
+          var eulerianPath = findEulerianPath();
+
+          text = "Chemin eulérien : " + eulerianPath.join(" -> ");
+          showLinkButton(text);
+          colorEulerianCircuit();
+        } else if (oddDegreeNodes === 2) {
+          // The graph has an Eulerian path
+
+          text = "Le graphe a un circuit eulérien.";
+          showLinkButton(text);
+          var eulerianPath = findEulerianPath();
+          text = "Chemin eulérien : " + eulerianPath.join(" -> ");
+          showLinkButton(text);
+          colorEulerianPath(eulerianPath);
+        } else {
+          // The graph is not Eulerian
+          text = "Le graphe n'est pas eulérien.";
+          showLinkButton(text);
+        }
+
+        function findEulerianPath() {
+          // Find the starting node for the Eulerian path
+          var startingNode = findStartingNode();
+
+          // Initialize the Eulerian path
+          var eulerianPath = [startingNode];
+
+          // Helper function to find a starting node for the Eulerian path
+          function findStartingNode() {
+            for (var i = 0; i < nodes.length; i++) {
+              var node = nodes.get()[i];
+              var degree = network.getConnectedNodes(node.id).length;
+              if (degree % 2 !== 0) {
+                return node.id;
+              }
+            }
+            return nodes.get()[0].id;
+          }
+
+          // Helper function to perform DFS and add nodes to the Eulerian path
+          function DFS(nodeId) {
+            var neighbors = network.getConnectedNodes(nodeId, "to");
+            for (var i = 0; i < neighbors.length; i++) {
+              var edgeIndex = copiedEdges.findIndex(
+                (edge) =>
+                  (edge.from === nodeId && edge.to === neighbors[i]) ||
+                  (edge.to === nodeId && edge.from === neighbors[i])
+              );
+
+              if (edgeIndex !== -1) {
+                var edgeId = copiedEdges[edgeIndex].id;
+                removeEdge(edgeIndex);
+                eulerianPath.push(neighbors[i]);
+                DFS(neighbors[i]);
+              }
+            }
+          }
+
+          // Perform DFS to find the Eulerian path
+          DFS(startingNode);
+
+          return eulerianPath;
+        }
+
+        function colorEulerianCircuit() {
+          // Color all edges
+          edges.forEach((edge) => {
+            edges.update({ id: edge.id, color: { color: "green" } });
+          });
+        }
+
+        function colorEulerianPath(eulerianPath) {
+          for (var i = 0; i < eulerianPath.length - 1; i++) {
+            var edgeIndex = copiedEdges.findIndex(
+              (edge) =>
+                (edge.from === eulerianPath[i] &&
+                  edge.to === eulerianPath[i + 1]) ||
+                (edge.to === eulerianPath[i] &&
+                  edge.from === eulerianPath[i + 1])
+            );
+
+            if (edgeIndex !== -1) {
+              var edgeId = copiedEdges[edgeIndex].id;
+              edges.update({ id: edgeId, color: { color: "blue" } });
+              removeEdge(edgeIndex);
+            }
+          }
+        }
+      }
+
+      function checkHamiltonianPath() {
+        console.log(graphDirectiontoggle);
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+
+        var isHamiltonianPath = isGraphHamiltonian();
+
+        if (isHamiltonianPath) {
+          var path = findHamiltonianPath();
+          text = path;
+          showLinkButton(text);
+        } else {
+          text = "Le graphe n'a pas de chaine hamiltonienne.";
+          showLinkButton(text);
+        }
+      }
+
+      function isGraphHamiltonian() {
+        var visited = {};
+        var nodesArray = nodes.get();
+        var edgesArray = edges.get();
+
+        // Start DFS from each node
+        for (var i = 0; i < nodesArray.length; i++) {
+          var startNodeId = nodesArray[i].id;
+
+          if (!visited[startNodeId]) {
+            if (DFS(startNodeId, new Set())) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+
+        // Depth-First Search
+        function DFS(nodeId, visitedNodes) {
+          visitedNodes.add(nodeId);
+
+          // Get outgoing neighbors considering direction
+          var neighbors = getOutgoingNeighbors(nodeId);
+          for (var i = 0; i < neighbors.length; i++) {
+            var neighborId = neighbors[i];
+
+            if (!visitedNodes.has(neighborId)) {
+              if (DFS(neighborId, new Set(visitedNodes))) {
+                return true;
+              }
+            }
+          }
+
+          // Check if all nodes are visited
+          for (var i = 0; i < nodesArray.length; i++) {
+            if (!visitedNodes.has(nodesArray[i].id)) {
+              return false;
+            }
+          }
+
+          return true;
+        }
+
+        // Get outgoing neighbors considering direction
+        function getOutgoingNeighbors(nodeId) {
+          var outgoingEdges = edgesArray.filter(
+            (edge) => edge.source === nodeId
+          );
+          var neighbors = outgoingEdges.map((edge) => edge.target);
+          return neighbors;
+        }
+      }
+
+      function findHamiltonianPath() {
+        var visited = {};
+        var path = [];
+
+        // Start DFS from each node
+        var nodesArray = nodes.get();
+        for (var i = 0; i < nodesArray.length; i++) {
+          var startNodeId = nodesArray[i].id;
+
+          if (!visited[startNodeId]) {
+            path = []; // Clear the path for each DFS traversal
+            DFS(startNodeId);
+            if (path.length === nodesArray.length) {
+              // Found a Hamiltonian path
+              return "Le graphe a une chaine hamiltonienne : " + path.join(",");
+            }
+          }
+        }
+
+        // If no Hamiltonian path is found
+        return "Aucun chemin hamiltonien trouvé.";
+
+        // Depth-First Search
+        // Depth-First Search
+        function DFS(nodeId) {
+          visited[nodeId] = true;
+          path.push(nodeId);
+
+          // Consider only incoming edges for Hamiltonian path
+          var neighbors = network.getConnectedNodes(nodeId, "to");
+          for (var i = 0; i < neighbors.length; i++) {
+            if (!visited[neighbors[i]]) {
+              DFS(neighbors[i]);
+            }
+          }
+
+          // If the path forms a Hamiltonian path, stop the DFS
+          if (path.length === nodesArray.length) {
+            return;
+          }
+
+          // Backtrack if no Hamiltonian path is found
+          visited[nodeId] = false;
+          path.pop();
+        }
+      }
+
+      // Get outgoing neighbors considering direction
+      function getOutgoingNeighbors(nodeId) {
+        var edgesArray = edges.get();
+        var outgoingEdges = edgesArray.filter((edge) => edge.source === nodeId);
+        var neighbors = outgoingEdges.map((edge) => edge.target);
+        return neighbors;
+      }
+
+      ////////////////////////////////////////////////////////
+      //toggle is off
+
+      /////////////////////////////////////////////////////////////
+      function checkHamiltonianCycle() {
+        if (graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+
+        var isHamiltonian = isGraphHamiltonian();
+
+        if (isHamiltonian) {
+          var path = findHamiltonianCycle();
+          if (path) {
+            text = "Le graphe a un cycle hamiltonien : " + path;
+          } else {
+            text = "Le graphe n'a pas de cycle hamiltonien.";
+          }
+          showLinkButton(text);
+        } else {
+          text = "Le graphe n'a pas de chaine hamiltonienne.";
+          showLinkButton(text);
+        }
+      }
+
+      function isGraphHamiltonian() {
+        var visited = {};
+        var nodesArray = nodes.get();
+
+        // Start DFS from each node
+        for (var i = 0; i < nodesArray.length; i++) {
+          var startNodeId = nodesArray[i].id;
+
+          if (!visited[startNodeId]) {
+            DFS(startNodeId);
+          }
+        }
+
+        // Check if all nodes are visited
+        for (var i = 0; i < nodesArray.length; i++) {
+          if (!visited[nodesArray[i].id]) {
+            return false;
+          }
+        }
+
+        return true;
+
+        // Depth-First Search
+        function DFS(nodeId) {
+          visited[nodeId] = true;
+
+          // Consider both incoming and outgoing edges
+          var neighbors = network.getConnectedNodes(nodeId);
+          for (var i = 0; i < neighbors.length; i++) {
+            if (!visited[neighbors[i]]) {
+              DFS(neighbors[i]);
+            }
+          }
+        }
+      }
+
+      function findHamiltonianCycle() {
+        var visited = {};
+        var path = [];
+
+        // Start DFS from each node
+        var nodesArray = nodes.get();
+        for (var i = 0; i < nodesArray.length; i++) {
+          var startNodeId = nodesArray[i].id;
+
+          path = [];
+          if (DFS(startNodeId, startNodeId, visited, path, 1)) {
+            return path.join(",");
+          }
+        }
+
+        // If no Hamiltonian cycle is found
+        return null;
+
+        // Depth-First Search
+        function DFS(nodeId, startNodeId, visited, path, count) {
+          visited[nodeId] = true;
+          path.push(nodeId);
+
+          // Check if all nodes are visited and the last node is connected to the starting node
+          if (
+            count === nodesArray.length &&
+            network.getConnectedNodes(nodeId).includes(startNodeId)
+          ) {
+            return true;
+          }
+
+          // Explore neighbors
+          var neighbors = network.getConnectedNodes(nodeId);
+          for (var i = 0; i < neighbors.length; i++) {
+            if (!visited[neighbors[i]]) {
+              if (DFS(neighbors[i], startNodeId, visited, path, count + 1)) {
+                return true;
+              }
+            }
+          }
+
+          // Backtrack if no Hamiltonian cycle is found
+          visited[nodeId] = false;
+          path.pop();
+          return false;
+        }
+      }
+
+      function showMinimumSpanningTree() {
+        if (graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        // Use Prim's algorithm to find the minimum spanning tree
+        const mstEdges = primAlgorithm();
+
+        // Highlight the edges in the minimum spanning tree
+        edges.forEach(function (edge) {
+          const edgeId = edge.id;
+          const isMSTEdge = mstEdges.some((mstEdge) => mstEdge.id === edgeId);
+
+          // Update the edge color based on whether it's in the MST
+          edges.update({
+            id: edgeId,
+            color: isMSTEdge ? "#00FF00" : "#000000",
+          });
+        });
+
+        // Update the network with the modified edges
+        network.setData({ nodes: nodes, edges: edges });
+      }
+
+      function primAlgorithm() {
+        // Perform Prim's algorithm to find the minimum spanning tree
+        // (You need to implement this algorithm based on your graph structure)
+
+        // For demonstration purposes, let's assume a simple graph structure with weighted edges
+        // The graph should be stored in the 'edges' dataset with 'label' property representing edge weights
+
+        const mstEdges = []; // To store the minimum spanning tree edges
+        const visitedNodes = new Set();
+
+        // Choose a starting node (you may adapt this based on your specific graph)
+        const startNodeId = nodes.get()[0].id;
+
+        // Start from the first node
+        visitedNodes.add(startNodeId);
+
+        while (visitedNodes.size < nodes.length) {
+          let minWeight = Infinity;
+          let minEdge = null;
+
+          // Find the minimum weighted edge connecting the visited and unvisited nodes
+          edges.forEach(function (edge) {
+            const fromNodeId = edge.from;
+            const toNodeId = edge.to;
+            const edgeWeight = parseFloat(edge.label || 0);
+
+            if (
+              (visitedNodes.has(fromNodeId) && !visitedNodes.has(toNodeId)) ||
+              (visitedNodes.has(toNodeId) && !visitedNodes.has(fromNodeId))
+            ) {
+              if (edgeWeight < minWeight) {
+                minWeight = edgeWeight;
+                minEdge = edge;
+              }
+            }
+          });
+
+          // Add the minimum edge to the minimum spanning tree
+          if (minEdge) {
+            mstEdges.push(minEdge);
+            visitedNodes.add(minEdge.from);
+            visitedNodes.add(minEdge.to);
+          } else {
+            // Break the loop if no valid edge is found (graph might be disconnected)
+            break;
+          }
+        }
+
+        return mstEdges;
+      }
+
+      function showMaximalMatching() {
+        if (graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        // Utilisez l'algorithme de couplage maximal pour trouver un couplage
+        const matchingEdges = maximalMatching();
+
+        // Mettez en surbrillance les arêtes dans le couplage
+        edges.forEach(function (edge) {
+          const edgeId = edge.id;
+          const isMatchingEdge = matchingEdges.some(
+            (matchingEdge) => matchingEdge.id === edgeId
+          );
+
+          // Mettez à jour la couleur de l'arête en fonction de son appartenance au couplage
+          edges.update({
+            id: edgeId,
+            color: isMatchingEdge ? "#FF0000" : "#000000",
+          });
+        });
+
+        // Mettez à jour le réseau avec les arêtes modifiées
+        network.setData({ nodes: nodes, edges: edges });
+      }
+
+      function maximalMatching() {
+        // Implémentez l'algorithme de couplage maximal (vous devrez peut-être adapter cela à votre structure de graphe spécifique)
+
+        // Pour la démonstration, supposons un graphe simple avec des arêtes non pondérées
+        // Le graphe doit être stocké dans le jeu de données 'edges'
+
+        const matchingEdges = []; // Pour stocker les arêtes du couplage
+        const unmatchedNodes = new Set(nodes.getIds()); // Ensemble des nœuds non couplés
+
+        // Parcourez les arêtes pour former le couplage maximal
+        edges.forEach(function (edge) {
+          const fromNodeId = edge.from;
+          const toNodeId = edge.to;
+
+          // Vérifiez si les deux nœuds ne sont pas déjà couplés
+          if (unmatchedNodes.has(fromNodeId) && unmatchedNodes.has(toNodeId)) {
+            // Ajoutez l'arête au couplage
+            matchingEdges.push(edge);
+
+            // Retirez les nœuds de l'ensemble des non couplés
+            unmatchedNodes.delete(fromNodeId);
+            unmatchedNodes.delete(toNodeId);
+          }
+        });
+
+        return matchingEdges;
+      }
+
+      function maxFlow(graph, source, sink) {
+        // Initialize the residual graph
+        const residualGraph = createResidualGraph(graph);
+
+        let maxFlow = 0;
+
+        // Find augmenting paths and update the residual graph
+        let path;
+        while (
+          (path = findAugmentingPath(residualGraph, source, sink)) !== null
+        ) {
+          let minCapacity = Infinity;
+
+          // Find the minimum capacity in the augmenting path
+          for (let i = 0; i < path.length - 1; i++) {
+            const from = path[i];
+            const to = path[i + 1];
+            const edge = residualGraph[from].find((e) => e.to === to);
+            minCapacity = Math.min(minCapacity, edge.capacity - edge.flow);
+          }
+
+          // Update the flow in the augmenting path
+          for (let i = 0; i < path.length - 1; i++) {
+            const from = path[i];
+            const to = path[i + 1];
+
+            // Update forward edge
+            const forwardEdge = residualGraph[from].find((e) => e.to === to);
+            forwardEdge.flow += minCapacity;
+
+            // Update backward edge
+            const backwardEdge = residualGraph[to].find((e) => e.to === from);
+            backwardEdge.flow -= minCapacity;
+          }
+
+          maxFlow += minCapacity;
+        }
+
+        return maxFlow;
+      }
+
+      function createResidualGraph(graph) {
+        const residualGraph = [];
+
+        // Create a copy of the original graph
+        for (const node of graph) {
+          const edges = [];
+          for (const edge of node.edges) {
+            edges.push({ to: edge.to, capacity: edge.capacity, flow: 0 });
+          }
+          residualGraph.push(edges);
+        }
+
+        return residualGraph;
+      }
+
+      function findAugmentingPath(residualGraph, source, sink) {
+        const visited = new Set();
+        const queue = [[source, []]];
+
+        while (queue.length > 0) {
+          const [currentNode, path] = queue.shift();
+          visited.add(currentNode);
+
+          for (const edge of residualGraph[currentNode]) {
+            const { to, capacity, flow } = edge;
+
+            if (!visited.has(to) && capacity > flow) {
+              const newPath = [...path, currentNode, to];
+
+              if (to === sink) {
+                return newPath;
+              }
+
+              queue.push([to, newPath]);
+            }
+          }
+        }
+
+        return null;
+      }
+
+      // Example usage:
+      const graph = [
+        {
+          edges: [
+            { to: 1, weight: 10 },
+            { to: 2, weight: 5 },
+          ],
+        },
+        {
+          edges: [
+            { to: 2, weight: 15 },
+            { to: 3, weight: 10 },
+          ],
+        },
+        { edges: [{ to: 3, weight: 10 }] },
+        { edges: [] },
+      ];
+
+      // Add this function to your existing JavaScript code
+      function calculateMaxFlow() {
+        // Update the source and sink nodes based on your graph
+        const source = 1; // Update with your source node ID
+        const sink = 2; // Update with your sink node ID
+
+        // Assuming 'graph' is your graph representation
+        const result = maxFlow(graph, source, sink);
+
+        // Display the result (you can modify this based on how you want to show the result)
+
+        text = "Max Flow: " + result;
+        showLinkButton(text);
+      }
+
+      function showmatrices() {
+        const graphData = { nodes, edges };
+        const adjacencyMatrix = createAdjacencyMatrix(graphData);
+        openMatrixPopup(adjacencyMatrix);
+      }
+
+      function createAdjacencyMatrix(graphData) {
+        const adjacencyMatrix = [];
+        const nodeIds = graphData.nodes.map((node) => node.id);
+
+        // Initialize the matrix with zeros
+        for (let i = 0; i < nodeIds.length; i++) {
+          adjacencyMatrix[i] = Array(nodeIds.length).fill("0");
+        }
+
+        // Fill the matrix based on edges
+        graphData.edges.forEach((edge) => {
+          const fromIndex = nodeIds.indexOf(edge.from);
+          const toIndex = nodeIds.indexOf(edge.to);
+          adjacencyMatrix[fromIndex][toIndex] = parseFloat(edge.label || 0);
+        });
+
+        return adjacencyMatrix;
+      }
+
+      function visualizeAdjacencyMatrix(adjacencyMatrix, nodeIds, containerId) {
+        const tableContainer = document.getElementById(containerId);
+        const table = document.createElement("table");
+
+        // Add header row with node names
+        const headerRow = table.insertRow();
+        headerRow.insertCell(); // Empty cell in the top-left corner
+        // Add node names to the header row
+        nodeIds.forEach((nodeId) => {
+          const headerCell = headerRow.insertCell();
+          headerCell.textContent = nodeId;
+        });
+
+        // Add rows and cells for the adjacency matrix
+        for (let i = 0; i < nodeIds.length; i++) {
+          const row = table.insertRow();
+          const headerCell = row.insertCell();
+
+          // Add node name to the first column
+          headerCell.textContent = nodeIds[i];
+
+          for (let j = 0; j < nodeIds.length; j++) {
+            const cell = row.insertCell();
+            cell.textContent = adjacencyMatrix[i][j];
+          }
+        }
+
+        // Append the table to the container
+        tableContainer.innerHTML = ""; // Clear existing content
+        tableContainer.appendChild(table);
+      }
+
+      // Ford-Fulkerson algorithm with flow distribution
+      function fordFulkersonWithFlowDistribution(graph, source, sink) {
+        const n = graph.length;
+        const residualGraph = createResidualGraph(graph);
+        const flowDistribution = new Array(n)
+          .fill(0)
+          .map(() => new Array(n).fill(0));
+
+        let maxFlow = 0;
+
+        // Continue as long as there's an augmenting path
+        while (true) {
+          const path = findAugmentingPath(residualGraph, source, sink);
+
+          if (path === null) {
+            // No augmenting path found, exit the loop
+            break;
+          }
+
+          // Find the minimum capacity along the augmenting path
+          let minCapacity = findMinCapacity(residualGraph, path);
+
+          // Update the residual capacities along the augmenting path
+          for (let i = 0; i < path.length - 1; i++) {
+            const from = path[i];
+            const to = path[i + 1];
+
+            residualGraph[from][to] -= minCapacity;
+            residualGraph[to][from] += minCapacity; // Back edge for residual capacity
+
+            // Update the flow distribution
+            flowDistribution[from][to] += minCapacity;
+            flowDistribution[to][from] -= minCapacity; // Corrected to be negative
+          }
+
+          // Add the flow of the current augmenting path to the total flow
+          maxFlow += minCapacity;
+        }
+        for (var i = 0; i < flowDistribution.length; i++)
+          for (var j = 0; j < flowDistribution.length; j++)
+            if (flowDistribution[i][j] < 0) {
+              flowDistribution[i][j] = 0;
+            }
+
+        return { maxFlow, flowDistribution };
+      }
+
+      // Helper function to find the minimum capacity along an augmenting path
+      function findMinCapacity(graph, path) {
+        let minCapacity = Infinity;
+
+        for (let i = 0; i < path.length - 1; i++) {
+          const from = path[i];
+          const to = path[i + 1];
+          minCapacity = Math.min(minCapacity, graph[from][to]);
+        }
+
+        return minCapacity;
+      }
+
+      // Helper function to create a residual graph from the original graph
+      function createResidualGraph(graph) {
+        const n = graph.length;
+        const residualGraph = new Array(n)
+          .fill(0)
+          .map(() => new Array(n).fill(0));
+
+        for (let i = 0; i < n; i++) {
+          for (let j = 0; j < n; j++) {
+            residualGraph[i][j] = graph[i][j];
+          }
+        }
+
+        return residualGraph;
+      }
+
+      // Helper function to find an augmenting path using BFS
+      function findAugmentingPath(graph, source, sink) {
+        const n = graph.length;
+        const visited = new Array(n).fill(false);
+        const parent = new Array(n).fill(-1);
+
+        const queue = [source];
+        visited[source] = true;
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+
+          for (let next = 0; next < n; next++) {
+            if (!visited[next] && graph[current][next] > 0) {
+              parent[next] = current;
+              visited[next] = true;
+              queue.push(next);
+
+              if (next === sink) {
+                // Reconstruct the augmenting path
+                const path = [];
+                for (let at = sink; at !== -1; at = parent[at]) {
+                  path.push(at);
+                }
+                return path.reverse();
+              }
+            }
+          }
+        }
+
+        return null; // No augmenting path found
+      }
+
+      function fordFulkersonAlgorithm() {
+        saveOriginalGraph();
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        // Prompt the user for two variables
+        var var1 = prompt("Enter the value for Variable 1:") - 1;
+        var var2 = prompt("Enter the value for Variable 2:") - 1;
+        const graphData = { nodes, edges };
+        const adjacencyMatrix = createAdjacencyMatrix(graphData);
+        // Display an  with the entered values
+        const { maxFlow, flowDistribution } = fordFulkersonWithFlowDistribution(
+          adjacencyMatrix,
+          var1,
+          var2
+        );
+        text = "Max Flow : " + maxFlow;
+        showLinkButton(text);
+        console.log("Flow Distribution:", flowDistribution);
+        updatefordlabel(flowDistribution);
+      }
+      function maxflowbutton() {
+        if (!graphDirectiontoggle) {
+          toggleGraphDirection();
+        }
+        saveOriginalGraph();
+        // Prompt the user for two variables
+        var var1 = prompt("Enter the value for Variable 1:") - 1;
+        var var2 = prompt("Enter the value for Variable 2:") - 1;
+        const graphData = { nodes, edges };
+        const adjacencyMatrix = createAdjacencyMatrix(graphData);
+        // Display an  with the entered values
+        const { maxFlow, flowDistribution } = fordFulkersonWithFlowDistribution(
+          adjacencyMatrix,
+          var1,
+          var2
+        );
+        text = "Max Flow : " + maxFlow;
+        showLinkButton(text);
+      }
+      function updatefordlabel(flowDistribution) {
+        const graphData = { nodes, edges };
+        const adjacencyMatrix = createAdjacencyMatrix(graphData);
+
+        for (var i = 0; i < flowDistribution.length; i++) {
+          for (var j = 0; j < flowDistribution[i].length; j++) {
+            if (adjacencyMatrix[i][j] !== 0) {
+              // Find the edge where edge.to = j+1 and edge.from = i+1
+              const edgeToUpdate = edges.get({
+                filter: (edge) =>
+                  edge.to === (j + 1).toString() &&
+                  edge.from === (i + 1).toString(),
+              })[0];
+
+              if (edgeToUpdate) {
+                // Update the label and show the old label
+
+                const oldLabel = edgeToUpdate.label || 0; // Assuming default is 0
+                edgeToUpdate.label = edgeToUpdate.label
+                  ? edgeToUpdate.label + "," + flowDistribution[i][j]
+                  : flowDistribution[i][j];
+                console.log(flowDistribution[i][j] + ",,,,," + oldLabel);
+                if (flowDistribution[i][j] == oldLabel) {
+                  edges.update({
+                    id: edgeToUpdate.id,
+                    color: { color: "red" },
+                  });
+                }
+                // Update the graph visualization
+                network.setData({ nodes: nodes, edges: edges });
+                console.log(
+                  `Updated edge from ${edgeToUpdate.from} to ${edgeToUpdate.to}. Old label: ${oldLabel}, New label: ${edgeToUpdate.label}`
+                );
+              }
+            }
+          }
+        }
+      }
+      function findMaxClique() {
+        ///here
+
+        saveOriginalGraph();
+        if (!graphDirectiontoggle) {
+          const graphData = { nodes, edges };
+
+          // Create an array to store the vertices and their degrees
+          const verticesDegrees = graphData.nodes.map((node) => ({
+            id: node.id,
+            degree: network.getConnectedNodes(node.id).length,
+          }));
+
+          // Sort vertices by degree in descending order
+          verticesDegrees.sort((a, b) => b.degree - a.degree);
+
+          // Initialize the clique with a node of maximum degree
+          const maxClique = new Set([verticesDegrees[0].id]);
+
+          // Greedy algorithm to find the maximum clique
+          verticesDegrees.forEach((vertex) => {
+            if (
+              Array.from(maxClique).every((cliqueVertex) =>
+                network.getConnectedNodes(cliqueVertex).includes(vertex.id)
+              ) &&
+              Array.from(maxClique).every((cliqueVertex) =>
+                network.getConnectedNodes(vertex.id).includes(cliqueVertex)
+              )
+            ) {
+              maxClique.add(vertex.id);
+            }
+          });
+
+          // Color the nodes in the maximum clique
+          const color = "red";
+          maxClique.forEach((nodeId) => {
+            const node = nodes.get(nodeId);
+            node.color = color;
+          });
+
+          // Update the graph visualization
+          network.setData({ nodes: nodes, edges: edges });
+        } else {
+          const graphData = { nodes, edges };
+
+          // Create an array to store the vertices and their in-degrees
+          const verticesInDegrees = graphData.nodes.map((node) => ({
+            id: node.id,
+            inDegree: network.getConnectedNodes(node.id, "to").length,
+          }));
+
+          // Sort vertices by in-degree in descending order
+          verticesInDegrees.sort((a, b) => b.inDegree - a.inDegree);
+
+          // Initialize the clique with a node of maximum in-degree
+          const maxClique = new Set([verticesInDegrees[0].id]);
+
+          // Greedy algorithm to find the maximum clique considering direction
+          verticesInDegrees.forEach((vertex) => {
+            if (
+              Array.from(maxClique).every((cliqueVertex) =>
+                network
+                  .getConnectedNodes(cliqueVertex, "to")
+                  .includes(vertex.id)
+              ) &&
+              Array.from(maxClique).every((cliqueVertex) =>
+                network
+                  .getConnectedNodes(vertex.id, "to")
+                  .includes(cliqueVertex)
+              )
+            ) {
+              maxClique.add(vertex.id);
+            }
+          });
+
+          // Color the nodes in the maximum clique
+          const color = "red";
+          maxClique.forEach((nodeId) => {
+            const node = nodes.get(nodeId);
+            node.color = color;
+          });
+
+          // Update the graph visualization
+          network.setData({ nodes: nodes, edges: edges });
+        }
+      }
+
+      // Call the function to find the maximum clique and color nodes
+
+      drawGraph();
+    </script>
+  </body>
+</html>
